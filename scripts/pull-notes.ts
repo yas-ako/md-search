@@ -50,6 +50,12 @@ async function downloadObject(client: S3Client, key: string) {
   return streamToString(res.Body);
 }
 
+function removeRelativeImages(markdown: string): string {
+  // Markdown画像参照 ![alt](path){attributes} の ! を削除
+  // ビルドエラーを避けるため、相対パス画像は画像参照ではなくテキストリンクに変換
+  return markdown.replace(/!\[([^\]]*)\]\(([^)]*)\)(\{[^}]*\})?/g, '[$1]($2)$3');
+}
+
 async function listKeys(client: S3Client, prefix: string): Promise<string[]> {
   let continuationToken: string | undefined;
   const keys: string[] = [];
@@ -89,7 +95,8 @@ async function main() {
   let count = 0;
   for (const key of keys) {
     if (!key.endsWith('.md')) continue;
-    const body = await downloadObject(s3, key);
+    let body = await downloadObject(s3, key);
+    body = removeRelativeImages(body);
     const filename = key.replace(/^notes\//, '');
     const outPath = path.join(OUT_DIR, filename);
     await fs.writeFile(outPath, body, 'utf-8');
