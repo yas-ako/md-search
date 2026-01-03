@@ -35,8 +35,8 @@ const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
 const S3_SECRET_KEY = process.env.S3_SECRET_KEY;
 const S3_BUCKET = process.env.S3_BUCKET;
 
-const BATCH_LIMIT = Number(process.env.FETCH_BATCH_LIMIT ?? '300'); // 1サイクルの最大件数
-const CONCURRENCY = Number(process.env.FETCH_CONCURRENCY ?? '4'); // 同時にリクエストする数
+const BATCH_LIMIT = process.env.FETCH_BATCH_LIMIT ? Number(process.env.FETCH_BATCH_LIMIT) : 300; // 1サイクルの最大件数
+const CONCURRENCY = process.env.FETCH_CONCURRENCY ? Number(process.env.FETCH_CONCURRENCY) : 4; // 同時にリクエストする数
 const TIMEOUT_MS = 10_000; // タイムアウト
 
 async function fetchWithTimeout(url: string, init: RequestInit & { timeoutMs?: number } = {}) {
