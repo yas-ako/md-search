@@ -30,7 +30,7 @@ const title = entry.data.title ?? id;
 <body>
     <div class="markdown-body">
         <h1>{title}</h1>
-        <p><a href="/">← 検索に戻る</a> | <a href={`https://md.trap.jp/${entry.data.id}`} target="_blank">元のCodiMDで見る</a></p>
+        <p><a href="/">← 検索に戻る</a> | <a href={`${import.meta.env.CODIMD_BASE_URL}/${entry.data.id}`} target="_blank">元のCodiMDで見る</a></p>
         <hr>
         <div data-pagefind-body>
             <Content />
