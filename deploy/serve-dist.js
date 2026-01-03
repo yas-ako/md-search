@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
 
@@ -8,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = __dirname; // deployディレクトリがルートになる
 
 const PORT = Number(process.env.PORT || '3000');
-const DIST_DIR = path.join(repoRoot, 'dist');
+const DIST_DIR = path.join(os.tmpdir(), 'dist');
 
 async function downloadDist() {
   console.log('[init] Downloading dist from S3...');

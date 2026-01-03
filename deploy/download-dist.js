@@ -14,7 +14,7 @@ const S3_BUCKET = process.env.S3_BUCKET;
 
 const S3_KEY = 'build/dist.tar.gz';
 const TAR_FILE = path.join(os.tmpdir(), 'dist.tar.gz');
-const DIST_DIR = 'dist';
+const DIST_DIR = path.join(os.tmpdir(), 'dist');
 
 function createS3Client() {
   return new S3Client({
