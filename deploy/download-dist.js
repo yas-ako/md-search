@@ -51,11 +51,16 @@ async function downloadFromS3(filePath) {
 }
 
 async function extractTarGz() {
-  console.log('Extracting tar.gz...');
+  console.log(`Extracting tar.gz to ${DIST_DIR}...`);
   const { spawn } = await import('child_process');
 
-  await fs.rm(DIST_DIR, { recursive: true, force: true });
-  await fs.mkdir(DIST_DIR, { recursive: true });
+  try {
+    await fs.rm(DIST_DIR, { recursive: true, force: true });
+    await fs.mkdir(DIST_DIR, { recursive: true });
+  } catch (err) {
+    console.error(`Failed to prepare dist dir: ${DIST_DIR}`);
+    throw err;
+  }
 
   return new Promise((resolve, reject) => {
     const tar = spawn('tar', ['-xzf', TAR_FILE, '-C', DIST_DIR], {
