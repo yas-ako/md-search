@@ -15,7 +15,6 @@ Astro + Pagefind で CodiMD を全文検索する。CodiMD から取得した Ma
 - 取得挙動の調整
   - `FETCH_BATCH_LIMIT`(既定 300)
   - `FETCH_CONCURRENCY`(既定 4)
-  - `BUILD_INTERVAL_MS`(任意、 定期ビルド間隔ミリ秒、 既定 3600000)
   - `PORT` または `SERVE_PORT`(任意、 配信ポート、 既定 3000)
 
 ## 開発・ビルド手順
@@ -37,21 +36,29 @@ npm run build
 npm run preview
 ```
 
-## Docker 実行（定期 pull/build + 静的サーブ）
-コンテナ起動時に S3 からの pull と Astro ビルドを行い、その後も一定間隔で再ビルドしつつ同一コンテナで配信します。
+## デプロイ・運用
+
+### GitHub Actions による自動化
+- **fetch workflow（`.github/workflows/fetch.yml`）**：1時間ごとに CodiMD から取得した Markdown を S3 にアップロード
+- **build workflow（`.github/workflows/build.yml`）**：6時間ごとに S3 から pull → Astro ビルド → dist を S3 にアップロード
+
+### Docker / Buildpack による配信
+コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開して配信します。
 
 ```sh
-# コンテナ起動時に実行
-npm run start  # 起動時に pull-notes & build を行い、その後 serve で dist を配信
+# Buildpack の場合（Procfile 使用）
+# Procfile: web: npm run serve-dist
 
-# 環境変数例（コンテナ実行環境で設定）
+# Docker の場合
+docker run -e S3_ENDPOINT=... -e S3_ACCESS_KEY=... -e S3_SECRET_KEY=... -e S3_BUCKET=... -p 3000:3000 <image>
+
+# 環境変数例
 S3_ENDPOINT=...
 S3_ACCESS_KEY=...
 S3_SECRET_KEY=...
 S3_BUCKET=...
 S3_REGION=auto
-BUILD_INTERVAL_MS=3600000  # 任意: 1時間毎に pull/build
-PORT=3000                  # 任意: 配信ポート
+PORT=3000  # 任意
 ```
 
-サーバは dist を配信し続け、ビルドはバックグラウンドで `pull-notes -> build -> postbuild` を行います。ビルドが完了すると dist を更新します。
+ビルドは GitHub Actions で完結し、配信コンテナはメモリを抑えて軽量に動作します。

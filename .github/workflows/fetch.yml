@@ -3,7 +3,7 @@ name: fetch-codimd
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */5 * * *'
+    - cron: '0 */1 * * *'
 
 permissions:
   contents: read
