@@ -1,11 +1,26 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// トップページ
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CodiMD 全文検索</title>
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+    <script src="/pagefind/pagefind-ui.js" is:inline></script>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; }
+        .search-container { margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <h1>CodiMD Archive Search</h1>
+    <div id="search" class="search-container"></div>
+
+    <script is:inline>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            new PagefindUI({ element: "#search", showSubResults: true });
+        });
+    </script>
+</body>
+</html>

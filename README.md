@@ -1,46 +1,27 @@
-# Astro Starter Kit: Basics
+# md-search
 
+Astro + Pagefind で CodiMD を全文検索する。ビルド時に CodiMD から Markdown を取得し、検索インデックスを生成。
+
+## 必要な環境変数 (.env)
+- `CODIMD_COOKIE` (必須): CodiMD への認証 Cookie
+- `CODIMD_BASE_URL` (必須): CodiMDのURL
+
+## 開発・ビルド手順
 ```sh
-npm create astro@latest -- --template basics
+
+# 依存関係のインストール
+npm install
+
+# データ取得 (認証が必要)
+npm run fetch
+
+# 静的ビルド + Pagefind インデックス生成
+# postbuild フックが走るので build だけで OK
+npm run build
+
+# ローカル確認
+npm run preview
 ```
+## Dockerfile によるデプロイ
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+開発中
