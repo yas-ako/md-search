@@ -25,7 +25,7 @@ type ManifestEntry = {
 
 type Manifest = Record<string, ManifestEntry>;
 
-// 環境変数と設定
+// 環境変数
 const BASE_URL = process.env.CODIMD_BASE_URL;
 const COOKIE = process.env.CODIMD_COOKIE;
 
@@ -35,10 +35,9 @@ const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
 const S3_SECRET_KEY = process.env.S3_SECRET_KEY;
 const S3_BUCKET = process.env.S3_BUCKET;
 
-// 制御パラメータ
-const FETCH_LIMIT = 20; // 取得する最大件数
-const CONCURRENCY = 2; // 同時リクエスト数
-const TIMEOUT_MS = 10_000; // fetch タイムアウト
+const BATCH_LIMIT = Number(process.env.FETCH_BATCH_LIMIT ?? '300'); // 1サイクルの最大件数
+const CONCURRENCY = Number(process.env.FETCH_CONCURRENCY ?? '4'); // 同時にリクエストする数
+const TIMEOUT_MS = 10_000; // タイムアウト
 
 async function fetchWithTimeout(url: string, init: RequestInit & { timeoutMs?: number } = {}) {
   const controller = new AbortController();
@@ -78,9 +77,9 @@ function createS3Client() {
     credentials:
       S3_ACCESS_KEY && S3_SECRET_KEY
         ? {
-            accessKeyId: S3_ACCESS_KEY,
-            secretAccessKey: S3_SECRET_KEY,
-          }
+          accessKeyId: S3_ACCESS_KEY,
+          secretAccessKey: S3_SECRET_KEY,
+        }
         : undefined,
     forcePathStyle: true,
   });
@@ -162,34 +161,48 @@ async function main() {
   console.log('Fetching note list...');
 
   try {
-    // 1. ノート一覧を取得
-    const { notes } = await fetchJson<NoteListResponse>(`${BASE_URL}/notes?limit=${FETCH_LIMIT}`);
+    // ノート一覧を取得
+    const { notes } = await fetchJson<NoteListResponse>(`${BASE_URL}/notes`);
     const total = notes.length;
-    console.log(`Found ${total} notes. Start downloading with concurrency: ${CONCURRENCY}...`);
 
-    // 並列実行の制御 (p-limit)
+    // まだ取得していないものを優先、lastFetchedAt が古い順
+    const candidates = [...notes]
+      .sort((a, b) => {
+        const aTime = manifest[a.id]?.lastFetchedAt;
+        const bTime = manifest[b.id]?.lastFetchedAt;
+        if (!aTime && !bTime) return 0;
+        if (!aTime) return -1;
+        if (!bTime) return 1;
+        return new Date(aTime).getTime() - new Date(bTime).getTime();
+      })
+      .slice(0, BATCH_LIMIT);
+
+    console.log(
+      `Found ${total} notes. Picking ${candidates.length} oldest entries. Concurrency: ${CONCURRENCY}`
+    );
+
+    // 並列実行
     const limit = pLimit(CONCURRENCY);
     let count = 0;
     let successCount = 0;
 
-    const tasks = notes.map((note) => {
+    const tasks = candidates.map((note) => {
       return limit(async () => {
         try {
-          // 進捗ログ
           count++;
           if (count % 100 === 0) {
-            console.log(`Processing: ${count}/${total} (${Math.round((count / total) * 100)}%)`);
+            console.log(`Processing: ${count}/${candidates.length} (${Math.round((count / candidates.length) * 100)}%)`);
           }
 
-          // 2. 本文ダウンロード
+          // 本文ダウンロード
           const body = await fetchText(`${BASE_URL}/${note.id}/download`);
 
-          // コンテンツチェック (空ならスキップ)
+          // 空ならスキップ
           if (!body) return;
 
-          // Frontmatter作成
+          // Frontmatter
           const dateStr = new Date(note.timestamp).toISOString();
-          const safeTitle = note.text.replace(/"/g, '\\"'); // タイトルのエスケープ
+          const safeTitle = (note.text || note.id).replace(/"/g, '\"');
 
           const fileContent = `---
 title: "${safeTitle}"
