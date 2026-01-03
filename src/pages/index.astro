@@ -1,26 +1,31 @@
 ---
-// トップページ
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const notes = await getCollection('notes');
+const noteCount = notes.length;
 ---
 
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>CodiMD 全文検索</title>
-    <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
-    <script src="/pagefind/pagefind-ui.js" is:inline></script>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; }
-        .search-container { margin-top: 2rem; }
-    </style>
-</head>
-<body>
-    <h1>CodiMD Search</h1>
-    <div id="search" class="search-container"></div>
+<Layout title="CodiMD Search">
+	<h1>CodiMD Search</h1>
+	<div class="stats">検索対象: {noteCount} 件</div>
+	<div id="search" class="search-container"></div>
 
-    <script is:inline>
-        window.addEventListener('DOMContentLoaded', (event) => {
-            new PagefindUI({ element: "#search", showSubResults: true });
-        });
-    </script>
-</body>
-</html>
+	<script is:inline>
+		window.addEventListener('DOMContentLoaded', (event) => {
+			new PagefindUI({ element: "#search", showSubResults: true });
+		});
+	</script>
+</Layout>
+
+<style>
+	.stats {
+		color: #666;
+		font-size: 0.9rem;
+		margin-bottom: 1rem;
+	}
+
+	.search-container {
+		margin-top: 2rem;
+	}
+</style>

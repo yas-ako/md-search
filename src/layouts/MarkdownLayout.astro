@@ -1,0 +1,62 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+	title: string;
+	id: string;
+	children: any;
+}
+
+const { title, id } = Astro.props;
+const codimdBaseUrl = import.meta.env.CODIMD_BASE_URL;
+---
+
+<Layout title={title}>
+	<div class="markdown-body">
+		<h1>{title}</h1>
+		<nav class="article-nav">
+			<a href="/">← 検索に戻る</a>
+			{codimdBaseUrl && (
+				<>
+					<span> | </span>
+					<a href={`${codimdBaseUrl}/${id}`} target="_blank">元のCodiMDで見る</a>
+				</>
+			)}
+		</nav>
+		<hr>
+		<div data-pagefind-body>
+			<slot />
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.markdown-body {
+		box-sizing: border-box;
+		min-width: 200px;
+		max-width: 980px;
+		margin: 0 auto;
+		padding: 45px;
+	}
+
+	.article-nav {
+		font-size: 0.9rem;
+		color: #666;
+		margin-bottom: 1rem;
+	}
+
+	.article-nav a {
+		color: #0969da;
+		text-decoration: none;
+	}
+
+	.article-nav a:hover {
+		text-decoration: underline;
+	}
+
+	hr {
+		border: none;
+		border-top: 1px solid #e5e5e5;
+		margin: 1rem 0;
+	}
+</style>

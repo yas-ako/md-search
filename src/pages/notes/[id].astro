@@ -1,4 +1,5 @@
 ---
+import MarkdownLayout from '../../layouts/MarkdownLayout.astro';
 import { getCollection, getEntry } from 'astro:content';
 
 // ビルド時に全記事のパスを生成する
@@ -18,24 +19,7 @@ const { Content } = await entry.render();
 const title = entry.data.title ?? id;
 ---
 
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>{title}</title>
+<MarkdownLayout title={title} id={entry.data.id}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown-light.min.css">
-    <style>
-        :global(:root) { color-scheme: light; }
-        .markdown-body { box-sizing: border-box; min-width: 200px; max-width: 980px; margin: 0 auto; padding: 45px; }
-    </style>
-</head>
-<body>
-    <div class="markdown-body">
-        <h1>{title}</h1>
-        <p><a href="/">← 検索に戻る</a> | <a href={`${import.meta.env.CODIMD_BASE_URL}/${entry.data.id}`} target="_blank">元のCodiMDで見る</a></p>
-        <hr>
-        <div data-pagefind-body>
-            <Content />
-        </div>
-    </div>
-</body>
-</html>
+    <Content />
+</MarkdownLayout>
