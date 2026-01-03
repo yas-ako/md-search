@@ -28,7 +28,7 @@ function createS3Client() {
   });
 }
 
-async function downloadFromS3(filePath: string) {
+async function downloadFromS3(filePath) {
   console.log(`Downloading s3://${S3_BUCKET}/${S3_KEY}...`);
   const s3 = createS3Client();
   const res = await s3.send(
@@ -40,7 +40,7 @@ async function downloadFromS3(filePath: string) {
 
   const writeStream = createWriteStream(filePath);
   await new Promise((resolve, reject) => {
-    (res.Body as any).pipe(writeStream);
+    res.Body.pipe(writeStream);
     writeStream.on('finish', resolve);
     writeStream.on('error', reject);
   });
@@ -59,7 +59,7 @@ async function extractTarGz() {
       stdio: 'inherit',
     });
     tar.on('close', (code) => {
-      if (code === 0) resolve(void 0);
+      if (code === 0) resolve();
       else reject(new Error(`tar exited with code ${code}`));
     });
   });

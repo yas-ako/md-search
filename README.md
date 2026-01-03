@@ -29,7 +29,7 @@ npm run fetch
 # S3/MinIO → ローカル同期（ビルド前に実行）
 npm run pull-notes
 
-# 静的ビルド + Pagefind インデックス生成（postbuild 自動）
+# Astroでビルド + Pagefind
 npm run build
 
 # ローカル確認
@@ -42,16 +42,18 @@ npm run preview
 - **fetch workflow（`.github/workflows/fetch.yml`）**：1時間ごとに CodiMD から取得した Markdown を S3 にアップロード
 - **build workflow（`.github/workflows/build.yml`）**：6時間ごとに S3 から pull → Astro ビルド → dist を S3 にアップロード
 
-### Docker / Buildpack による配信
-コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開して配信します。
+### デプロイ
+コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開する。
 
 ```sh
-# Buildpack の場合（Procfile 使用）
-# Procfile: web: npm run serve-dist
+# 依存関係のインストール
+cd deploy && npm install
 
-# Docker の場合
-docker run -e S3_ENDPOINT=... -e S3_ACCESS_KEY=... -e S3_SECRET_KEY=... -e S3_BUCKET=... -p 3000:3000 <image>
+# サーバー起動 (S3からダウンロード -> 展開 -> サーバーを起動)
+cd deploy && npm start
+```
 
+```sh
 # 環境変数例
 S3_ENDPOINT=...
 S3_ACCESS_KEY=...

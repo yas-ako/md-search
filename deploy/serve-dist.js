@@ -5,7 +5,7 @@ import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, '..');
+const repoRoot = __dirname; // deployディレクトリがルートになる
 
 const PORT = Number(process.env.PORT || '3000');
 const DIST_DIR = path.join(repoRoot, 'dist');
@@ -14,7 +14,7 @@ async function downloadDist() {
   console.log('[init] Downloading dist from S3...');
   const { spawn: spawnNode } = await import('child_process');
   return new Promise((resolve, reject) => {
-    const proc = spawnNode('npx', ['tsx', 'scripts/download-dist.ts'], {
+    const proc = spawnNode('node', ['download-dist.js'], {
       cwd: repoRoot,
       stdio: 'inherit',
       env: process.env,

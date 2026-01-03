@@ -10,9 +10,7 @@
     "postbuild": "node scripts/postbuild.js",
     "fetch": "tsx scripts/fetch-codimd.ts",
     "pull-notes": "tsx scripts/pull-notes.ts",
-    "upload-dist": "tsx scripts/upload-dist.ts",
-    "download-dist": "tsx scripts/download-dist.ts",
-    "start": "node scripts/serve-dist.js"
+    "upload-dist": "tsx scripts/upload-dist.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
