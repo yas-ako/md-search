@@ -7,9 +7,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "postbuild": "pagefind --site dist --output-subdir pagefind",
+    "postbuild": "node scripts/postbuild.js",
     "fetch": "tsx scripts/fetch-codimd.ts",
-    "pull-notes": "tsx scripts/pull-notes.ts"
+    "pull-notes": "tsx scripts/pull-notes.ts",
+    "start": "node scripts/runtime.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -20,6 +21,7 @@
     "marked": "^15.0.11",
     "p-limit": "^6.1.0",
     "pagefind": "^1.3.0",
+    "serve": "^14.2.2",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   }
