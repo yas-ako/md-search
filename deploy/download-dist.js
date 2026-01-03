@@ -3,6 +3,9 @@ import { createWriteStream } from 'fs';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import 'dotenv/config';
 
+import path from 'path';
+import os from 'os';
+
 const S3_ENDPOINT = process.env.S3_ENDPOINT;
 const S3_REGION = process.env.S3_REGION || 'auto';
 const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
@@ -10,7 +13,7 @@ const S3_SECRET_KEY = process.env.S3_SECRET_KEY;
 const S3_BUCKET = process.env.S3_BUCKET;
 
 const S3_KEY = 'build/dist.tar.gz';
-const TAR_FILE = 'dist.tar.gz';
+const TAR_FILE = path.join(os.tmpdir(), 'dist.tar.gz');
 const DIST_DIR = 'dist';
 
 function createS3Client() {
