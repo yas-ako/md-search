@@ -1,4 +1,5 @@
 import pLimit from 'p-limit';
+import YAML from 'js-yaml';
 import {
   S3Client,
   GetObjectCommand,
@@ -201,17 +202,12 @@ async function main() {
           if (!body) return;
 
           // Frontmatter
-          const dateStr = new Date(note.timestamp).toISOString();
-          const safeTitle = (note.text || note.id).replace(/"/g, '\"');
-
-          const fileContent = `---
-title: "${safeTitle}"
-id: "${note.id}"
-date: "${dateStr}"
----
-
-${body}
-`;
+          const frontmatter = {
+            title: note.text || note.id,
+            id: note.id,
+            date: new Date(note.timestamp).toISOString(),
+          };
+          const fileContent = `---\n${YAML.dump(frontmatter)}---\n\n${body}\n`;
 
           await uploadNote(s3, note.id, fileContent);
           manifest[note.id] = { lastFetchedAt: new Date().toISOString() };
