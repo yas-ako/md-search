@@ -15,6 +15,10 @@ Astro + Pagefind で CodiMD を全文検索する。CodiMD から取得した Ma
 - 取得挙動の調整
   - `FETCH_BATCH_LIMIT`(既定 300)
   - `FETCH_CONCURRENCY`(既定 4)
+  - `FETCH_TIMEOUT_MS`(既定 10000)
+  - `FETCH_REQUEST_INTERVAL_MS`(既定 0)
+  - `FETCH_RETRY_LIMIT`(既定 2)
+  - `FETCH_RETRY_BASE_DELAY_MS`(既定 2000)
   - `PORT` または `SERVE_PORT`(任意、 配信ポート、 既定 3000)
 
 ## 開発・ビルド手順
@@ -41,6 +45,8 @@ npm run preview
 ### GitHub Actions による自動化
 - **fetch workflow（`.github/workflows/fetch.yml`）**：1時間ごとに CodiMD から取得した Markdown を S3 にアップロード
 - **build workflow（`.github/workflows/build.yml`）**：6時間ごとに S3 から pull → Astro ビルド → dist を S3 にアップロード
+
+`fetch` は CodiMD の `/notes` を正として扱い、CodiMD 側から削除されたノートは S3/MinIO の `notes/{id}.md` と manifest からも削除する。
 
 ### デプロイ
 コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開する。
