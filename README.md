@@ -19,6 +19,7 @@ Astro + Pagefind で CodiMD を全文検索する。CodiMD から取得した Ma
   - `FETCH_REQUEST_INTERVAL_MS`(既定 0)
   - `FETCH_RETRY_LIMIT`(既定 2)
   - `FETCH_RETRY_BASE_DELAY_MS`(既定 2000)
+  - `DIST_REFRESH_INTERVAL_MS`(任意、配信サーバーの dist 更新確認間隔、未指定なら起動時のみ)
   - `PORT` または `SERVE_PORT`(任意、 配信ポート、 既定 3000)
 
 ## 開発・ビルド手順
@@ -44,12 +45,12 @@ npm run preview
 
 ### GitHub Actions による自動化
 - **fetch workflow（`.github/workflows/fetch.yml`）**：1時間ごとに CodiMD から取得した Markdown を S3 にアップロード
-- **build workflow（`.github/workflows/build.yml`）**：6時間ごとに S3 から pull → Astro ビルド → dist を S3 にアップロード
+- **build workflow（`.github/workflows/build.yml`）**：2時間ごとに S3 から pull → Astro ビルド → dist を S3 にアップロード
 
 `fetch` は CodiMD の `/notes` を正として扱い、CodiMD 側から削除されたノートは S3/MinIO の `notes/{id}.md` と manifest からも削除する。
 
 ### デプロイ
-コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開する。
+コンテナ起動時に S3 から最新の `dist.tar.gz` をダウンロードし、展開する。`DIST_REFRESH_INTERVAL_MS` を設定すると、配信中も S3 の `dist.tar.gz` 更新を定期確認し、更新があれば再取得して `serve` を再起動する。更新反映時は短時間配信が停止する可能性がある。
 
 ```sh
 # 依存関係のインストール
@@ -67,6 +68,7 @@ S3_SECRET_KEY=...
 S3_BUCKET=...
 S3_REGION=auto
 PORT=3000  # 任意
+DIST_REFRESH_INTERVAL_MS=900000  # 任意、15分ごとに更新確認
 ```
 
 ビルドは GitHub Actions で完結し、配信コンテナはメモリを抑えて軽量に動作します。

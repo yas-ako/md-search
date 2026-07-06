@@ -2,7 +2,7 @@ name: Build and Upload
 
 on:
   schedule:
-    - cron: '0 */2 * * *'  # 6時間ごと
+    - cron: '0 */2 * * *'  # 2時間ごと
   workflow_dispatch:
 
 jobs:
